@@ -2,8 +2,7 @@ import { Task } from "../models/Task";
 import { ITaskRepository } from "../repositories/ITaskRepository";
 
 interface TaskRequest {
-  id: number;
-  task: string;
+  description: string;
   userId: string;
   timestamp: number;
 }
@@ -12,23 +11,24 @@ export class TaskService {
   constructor(private readonly repository: ITaskRepository) {}
 
   async createTask(data: TaskRequest): Promise<Task> {
-
     const task = new Task(
-      data.id,
-      data.task,
+      data.description,
       data.userId,
       new Date(data.timestamp)
     );
-    await this.repository.save(task);
 
-    return task;
+    return await this.repository.save(task);
   }
 
-  async getTask(id: string) {
-    return this.repository.findById(id);
+  async listTasks(userId: string, from?: number, to?: number): Promise<Task[]> {
+    return this.repository.findAll(userId, from, to);
   }
 
-  async listTasks() {
-    return this.repository.findAll();
+  async deleteTask(userId: string, taskId: number): Promise<void> {
+    await this.repository.delete(userId, taskId);
+  }
+
+  async getTask(taskId: number): Promise<Task | null> {
+    return this.repository.findById(taskId);
   }
 }

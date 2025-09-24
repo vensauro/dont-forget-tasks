@@ -4,7 +4,7 @@ import { TaskConsumer } from "./consumers/TaskConsumer";
 import { RabbitMQProviderFactory } from "./providers/rabbitmq/RabbitMQProviderFactory";
 
 class Application {
-  private readonly rabbitProvider;
+  private readonly rabbitProvider: ReturnType<typeof RabbitMQProviderFactory.create>;
   private readonly port: number;
 
   constructor() {
@@ -26,8 +26,8 @@ class Application {
     ) {
       console.log("💡 Enviando mensagem fake inicial...");
       await (this.rabbitProvider as any).seedMessage("task_queue", {
-        id: 1,
-        task: "Não esqueça de criar a primeira task!",
+        // id: 1,
+        description: "Não esqueça de criar a primeira task!",
         userId: "db89a526-fab3-48cf-9771-1b993e9578c9",
         timestamp: 1758678484365
       });

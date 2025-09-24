@@ -1,7 +1,8 @@
 export class Task {
+  public id?: number;
+
   constructor(
-    public readonly id: number,
-    public task: string,
+    public description: string,
     public userId: string,
     public dateTime: Date
   ) {}
