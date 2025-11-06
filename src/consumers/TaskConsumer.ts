@@ -1,4 +1,4 @@
-import { IRabbitMQProvider } from "../providers/rabbitmq/IRabbitMQProvider";
+import { IRabbitMQProvider } from "../providers/messaging/IRabbitMQProvider";
 import { TaskService } from "../services/TaskService";
 import { TaskPublisher } from "../publishers/TaskPublisher";
 import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";

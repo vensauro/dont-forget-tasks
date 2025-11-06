@@ -1,7 +1,7 @@
 import app from "./app";
 import { env } from "./config/env";
 import { TaskConsumer } from "./consumers/TaskConsumer";
-import { RabbitMQProviderFactory } from "./providers/rabbitmq/RabbitMQProviderFactory";
+import { RabbitMQProviderFactory } from "./providers/messaging/RabbitMQProviderFactory";
 
 class Application {
   private readonly rabbitProvider: ReturnType<typeof RabbitMQProviderFactory.create>;

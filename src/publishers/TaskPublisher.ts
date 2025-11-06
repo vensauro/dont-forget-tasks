@@ -1,4 +1,4 @@
-import { IRabbitMQProvider } from "../providers/rabbitmq/IRabbitMQProvider";
+import { IRabbitMQProvider } from "../providers/messaging/IRabbitMQProvider";
 
 export interface EventBase<T = unknown> {
   type: "task.error";
