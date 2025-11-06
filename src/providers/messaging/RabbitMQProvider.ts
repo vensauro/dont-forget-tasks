@@ -1,9 +1,9 @@
 import amqp, { Connection, Channel, ConsumeMessage } from "amqplib";
 import { ChannelModel } from 'amqplib';
 import { env } from "../../config/env";
-import { IRabbitMQProvider } from "./IRabbitMQProvider";
+import { IMessengerProvider } from "./IMessengerProvider";
 
-export class RabbitMQProvider implements IRabbitMQProvider {
+export class RabbitMQProvider implements IMessengerProvider {
   private connection!: ChannelModel;
   private channel!: Channel;
 

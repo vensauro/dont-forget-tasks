@@ -1,6 +1,6 @@
-import { IRabbitMQProvider } from "./IRabbitMQProvider";
+import { IMessengerProvider } from "./IMessengerProvider";
 
-export class RabbitMQProviderFake implements IRabbitMQProvider {
+export class RabbitMQProviderFake implements IMessengerProvider {
   private channel: any;
   private consumers: { [queue: string]: (msg: any) => void } = {};
 

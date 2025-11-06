@@ -1,4 +1,4 @@
-import { IRabbitMQProvider } from "../providers/messaging/IRabbitMQProvider";
+import { IMessengerProvider } from "../providers/messaging/IMessengerProvider";
 
 export interface EventBase<T = unknown> {
   type: "task.error";
@@ -14,7 +14,7 @@ const EVENT_ROUTES = {
 } as const;
 
 export class TaskPublisher {
-  constructor(private readonly messaging: IRabbitMQProvider) {}
+  constructor(private readonly messaging: IMessengerProvider) {}
 
   async taskError(evt: EventBase): Promise<void> {
     try {

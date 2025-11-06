@@ -3,6 +3,7 @@ import { TaskService } from "../services/TaskService";
 import { TaskPublisher } from "../publishers/TaskPublisher";
 import { RabbitMQProvider } from "../providers/messaging/RabbitMQProvider";
 import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";
+import { MessengerProviderFactory } from "../providers/messaging/MessengerProviderFactory";
 
 interface BaseEvent<T> {
   Type: string;
@@ -27,45 +28,14 @@ export class TaskController {
   private publisher: TaskPublisher;
 
   constructor() {
-    const rabbitProvider = new RabbitMQProvider();
-    this.publisher = new TaskPublisher(rabbitProvider);
+    const messengerProvider = MessengerProviderFactory.create(true);
+    this.publisher = new TaskPublisher(messengerProvider);
 
     const taskRepository = TaskRepositoryFactory.create();
     this.service = new TaskService(taskRepository);
   }
 
   health = (req: Request, res: Response) => res.status(200).json(true);
-
-  createTask = async (req: Request, res: Response) => {
-    try {
-      const event = req.body as BaseEvent<TaskCreateData>;
-
-      if (!event?.Data?.Description || !event?.UserId || !event?.Data?.CreatedAt) {
-        return res.status(400).json({ error: "Campos obrigatórios ausentes: Description, UserId ou CreatedAt" });
-      }
-
-      const task = await this.service.createTask({
-        description: event.Data.Description,
-        userId: event.UserId,
-        createdAt: event.Data.CreatedAt
-      });
-
-      return res.status(201).json({
-        Type: "task.created",
-        CorrelationId: event.CorrelationId,
-        UserId: event.UserId,
-        OccurredAt: new Date().toISOString(),
-        Data: {
-          Id: task.id,
-          Description: task.description,
-          CreatedAt: task.createdAt
-        }
-      });
-    } catch (error: any) {
-      console.error(error);
-      return res.status(500).json({ error: error.message });
-    }
-  };
 
   listTasks = async (req: Request, res: Response) => {
     try {

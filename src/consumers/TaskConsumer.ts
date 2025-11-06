@@ -1,4 +1,4 @@
-import { IRabbitMQProvider } from "../providers/messaging/IRabbitMQProvider";
+import { IMessengerProvider } from "../providers/messaging/IMessengerProvider";
 import { TaskService } from "../services/TaskService";
 import { TaskPublisher } from "../publishers/TaskPublisher";
 import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";
@@ -13,16 +13,15 @@ interface DeletePayload {
 }
 
 export class TaskConsumer {
-  static async init(rabbit: IRabbitMQProvider): Promise<void> {
+  static async init(messenger: IMessengerProvider): Promise<void> {
     const queueName = "task_queue";
 
     const repository = TaskRepositoryFactory.create();
     const service = new TaskService(repository);
-    const publisher = new TaskPublisher(rabbit);
+    const publisher = new TaskPublisher(messenger);
 
-    await rabbit.consume(queueName, async (envelope: any) => {
+    await messenger.consume(queueName, async (envelope: any) => {
       try {
-        // Pega apenas o conteúdo da mensagem
         const cmd = envelope?.message;
         if (!cmd) {
           console.warn("[TaskConsumer] Envelope sem mensagem:", envelope);

@@ -1,31 +1,31 @@
 import app from "./app";
 import { env } from "./config/env";
 import { TaskConsumer } from "./consumers/TaskConsumer";
-import { RabbitMQProviderFactory } from "./providers/messaging/RabbitMQProviderFactory";
+import { MessengerProviderFactory } from "./providers/messaging/MessengerProviderFactory";
 
 class Application {
-  private readonly rabbitProvider: ReturnType<typeof RabbitMQProviderFactory.create>;
+  private readonly messengerProvider: ReturnType<typeof MessengerProviderFactory.create>;
   private readonly port: number;
 
   constructor() {
     const useFake = process.env.USE_RABBIT === "false";
-    this.rabbitProvider = RabbitMQProviderFactory.create(useFake);
+    this.messengerProvider = MessengerProviderFactory.create(useFake);
     this.port = env.port;
   }
 
   private async initRabbit() {
-    await this.rabbitProvider.init();
-    await TaskConsumer.init(this.rabbitProvider);
+    await this.messengerProvider.init();
+    await TaskConsumer.init(this.messengerProvider);
     console.log("📡 RabbitMQ conectado e consumers iniciados.");
 
     // Se estiver usando Fake e quiser seed manual
     if (
       process.env.USE_RABBIT === "false" &&
       process.env.SEED_FAKE_MESSAGES === "true" &&
-      typeof (this.rabbitProvider as any).seedMessage === "function"
+      typeof (this.messengerProvider as any).seedMessage === "function"
     ) {
       console.log("💡 Enviando mensagem fake inicial...");
-      await (this.rabbitProvider as any).seedMessage("task_queue", {
+      await (this.messengerProvider as any).seedMessage("task_queue", {
         type: "task.create",
         correlationId: "ci89a526-fab3-48cf-9771-1b993e9578c7",
         userId: "db89a526-fab3-48cf-9771-1b993e9578c9",

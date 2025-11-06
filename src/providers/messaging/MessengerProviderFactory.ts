@@ -1,9 +1,9 @@
-import { IRabbitMQProvider } from "./IRabbitMQProvider";
+import { IMessengerProvider } from "./IMessengerProvider";
 import { RabbitMQProvider } from "./RabbitMQProvider";
 import { RabbitMQProviderFake } from "./RabbitMQProviderFake";
 
-export class RabbitMQProviderFactory {
-  static create(useFake: boolean): IRabbitMQProvider {
+export class MessengerProviderFactory {
+  static create(useFake: boolean): IMessengerProvider {
     return useFake ? new RabbitMQProviderFake() : new RabbitMQProvider();
   }
 }

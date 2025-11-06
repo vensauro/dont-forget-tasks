@@ -1,4 +1,4 @@
-export interface IRabbitMQProvider {
+export interface IMessengerProvider {
   init(): Promise<void>;
   getChannel(): any;
   publish(queue: string, message: object): Promise<void>;
