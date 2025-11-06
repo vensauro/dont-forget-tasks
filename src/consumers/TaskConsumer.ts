@@ -1,4 +1,4 @@
-import { IMessengerProvider } from "../providers/messaging/IMessengerProvider";
+import { IMessengerProvider } from "../providers/messenger/IMessengerProvider";
 import { TaskService } from "../services/TaskService";
 import { TaskPublisher } from "../publishers/TaskPublisher";
 import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";

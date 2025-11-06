@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { TaskService } from "../services/TaskService";
 import { TaskPublisher } from "../publishers/TaskPublisher";
-import { RabbitMQProvider } from "../providers/messaging/RabbitMQProvider";
+import { RabbitMQProvider } from "../providers/messenger/RabbitMQProvider";
 import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";
-import { MessengerProviderFactory } from "../providers/messaging/MessengerProviderFactory";
+import { MessengerProviderFactory } from "../providers/messenger/MessengerProviderFactory";
 
 interface BaseEvent<T> {
   Type: string;

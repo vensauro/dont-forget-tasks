@@ -1,4 +1,4 @@
-import { IMessengerProvider } from "../providers/messaging/IMessengerProvider";
+import { IMessengerProvider } from "../providers/messenger/IMessengerProvider";
 
 export interface EventBase<T = unknown> {
   type: "task.error";

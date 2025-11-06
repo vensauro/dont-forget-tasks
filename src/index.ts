@@ -1,7 +1,7 @@
 import app from "./app";
 import { env } from "./config/env";
 import { TaskConsumer } from "./consumers/TaskConsumer";
-import { MessengerProviderFactory } from "./providers/messaging/MessengerProviderFactory";
+import { MessengerProviderFactory } from "./providers/messenger/MessengerProviderFactory";
 
 class Application {
   private readonly messengerProvider: ReturnType<typeof MessengerProviderFactory.create>;
