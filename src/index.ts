@@ -13,10 +13,10 @@ class Application {
     this.port = env.port;
   }
 
-  private async initRabbit() {
+  private async initMessenger() {
     await this.messengerProvider.init();
     await TaskConsumer.init(this.messengerProvider);
-    console.log("📡 RabbitMQ conectado e consumers iniciados.");
+    console.log("📡 Mensageiro (RabbitMQ) conectado e consumers iniciados.");
 
     // Se estiver usando Fake e quiser seed manual
     if (
@@ -46,12 +46,10 @@ class Application {
 
   public async start() {
     try {
-      await this.initRabbit();
-
+      await this.initMessenger();
       if (process.env.ENABLE_HTTP === "true") {
         this.initHttp();
       }
-
       console.log("✅ Aplicação iniciada com sucesso!");
     } catch (error) {
       console.error("❌ Erro ao iniciar a aplicação:", error);

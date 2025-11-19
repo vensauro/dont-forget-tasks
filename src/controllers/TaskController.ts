@@ -1,36 +1,10 @@
 import { Request, Response } from "express";
 import { TaskService } from "../services/TaskService";
-import { TaskPublisher } from "../publishers/TaskPublisher";
-import { RabbitMQProvider } from "../providers/messenger/RabbitMQProvider";
 import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";
-import { MessengerProviderFactory } from "../providers/messenger/MessengerProviderFactory";
-
-interface BaseEvent<T> {
-  Type: string;
-  CorrelationId: string;
-  UserId: string;
-  Data: T;
-  OccurredAt: string;
-}
-
-interface TaskCreateData {
-  Description: string;
-  CreatedAt: string; // ISO
-}
-
-// interface ListTaskData {
-//   From?: string;
-//   To?: string;
-// }
 
 export class TaskController {
   private service: TaskService;
-  private publisher: TaskPublisher;
-
   constructor() {
-    const messengerProvider = MessengerProviderFactory.create(true);
-    this.publisher = new TaskPublisher(messengerProvider);
-
     const taskRepository = TaskRepositoryFactory.create();
     this.service = new TaskService(taskRepository);
   }
@@ -45,14 +19,10 @@ export class TaskController {
         return res.status(400).json({ error: "UserId é obrigatório" });
       }
 
-      // const from = event.Data?.From ? new Date(event.Data.From).getTime() : undefined;
-      // const to = event.Data?.To ? new Date(event.Data.To).getTime() : undefined;
-
       const tasks = await this.service.listTasks(userId);
 
       return res.status(200).json({
         Type: "task.listed",
-        // CorrelationId: event.CorrelationId,
         UserId: userId,
         OccurredAt: new Date().toISOString(),
         Data: tasks
@@ -80,7 +50,6 @@ export class TaskController {
 
       return res.status(200).json({
         Type: "task.get",
-        // CorrelationId: event.CorrelationId,
         UserId: userId,
         OccurredAt: new Date().toISOString(),
         Data: task
