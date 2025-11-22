@@ -26,14 +26,25 @@ class Application {
     ) {
       console.log("💡 Enviando mensagem fake inicial...");
       await (this.messengerProvider as any).seedMessage("task_queue", {
-        type: "task.create",
-        correlationId: "ci89a526-fab3-48cf-9771-1b993e9578c7",
-        userId: "db89a526-fab3-48cf-9771-1b993e9578c9",
-        payload: {
-          description: "Não esqueça de criar a primeira task!",
-          userId: "db89a526-fab3-48cf-9771-1b993e9578c9",
-          timestamp: 1758678484365,
-        }
+        Type: "category.create",
+        CorrelationId: "ci89a526-fab3-48cf-9771-1b993e9578c6",
+        Data: {
+          UserId: "db89a526-fab3-48cf-9771-1b993e9578c9",
+          Name: "Faculdade"
+        },
+        OccurredAt: "2025-11-22T18:30:00.000Z"
+      });
+      await (this.messengerProvider as any).seedMessage("task_queue", {
+        Type: "task.create",
+        CorrelationId: "ci89a526-fab3-48cf-9771-1b993e9578c7",
+        Data: {
+          Description: "Não esqueça de criar a primeira task!",
+          CategoryId: 1,
+          ExpiredAt: "2025-12-18T18:30:00.000Z",
+          UserId: "db89a526-fab3-48cf-9771-1b993e9578c9",
+          DeviceToken: "123456789"
+        },
+        OccurredAt: "2025-11-22T18:30:00.000Z"
       });
     }
   }

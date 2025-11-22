@@ -1,5 +1,6 @@
 import { createClient, RedisClientType } from "redis";
-import { ICategoryRepository, Category } from "./ICategoryRepository";
+import { ICategoryRepository } from "./ICategoryRepository";
+import { Category } from "../models/Category";
 
 export class RedisCategoryRepository implements ICategoryRepository {
   private static client: RedisClientType | null = null;
@@ -51,7 +52,7 @@ export class RedisCategoryRepository implements ICategoryRepository {
       Name: name,
     });
     await this.client.rPush(this.listKey(userId), id.toString());
-    return { id, userId, name };
+    return { Id: id, UserId: userId, Name: name };
   }
 
   async findAll(userId: string): Promise<Category[]> {
@@ -63,9 +64,9 @@ export class RedisCategoryRepository implements ICategoryRepository {
       const data = await this.client.hGetAll(this.categoryKey(userId, id));
       if (Object.keys(data).length === 0) continue;
       categories.push({
-        id,
-        userId,
-        name: data.Name,
+        Id: id,
+        UserId: userId,
+        Name: data.Name,
       });
     }
     return categories;
@@ -76,9 +77,9 @@ export class RedisCategoryRepository implements ICategoryRepository {
     const data = await this.client.hGetAll(this.categoryKey(userId, categoryId));
     if (Object.keys(data).length === 0) return null;
     return {
-      id: categoryId,
-      userId,
-      name: data.Name,
+      Id: categoryId,
+      UserId: userId,
+      Name: data.Name,
     };
   }
 

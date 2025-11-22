@@ -1,8 +1,4 @@
-export interface Category {
-  id: number;
-  userId: string;
-  name: string;
-}
+import { Category } from "../models/Category";
 
 export interface ICategoryRepository {
   save(userId: string, name: string): Promise<Category>;

@@ -1,4 +1,5 @@
-import { ICategoryRepository, Category } from "./ICategoryRepository";
+import { Category } from "../models/Category";
+import { ICategoryRepository } from "./ICategoryRepository";
 
 export class InMemoryCategoryRepository implements ICategoryRepository {
   private categories: Record<string, Category[]> = {};
@@ -12,9 +13,9 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
     }
     const newId = ++this.counters[userId];
     const category: Category = {
-      id: newId,
-      userId,
-      name,
+      Id: newId,
+      UserId: userId,
+      Name: name,
     };
     if (!this.categories[userId]) {
       this.categories[userId] = [];
@@ -30,13 +31,13 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
   async findById(userId: string, categoryId: number): Promise<Category | null> {
     const list = this.categories[userId];
     if (!list) return null;
-    return list.find(c => c.id === categoryId) || null;
+    return list.find(c => c.Id === categoryId) || null;
   }
 
   async delete(userId: string, categoryId: number): Promise<void> {
     const list = this.categories[userId];
     if (!list) return;
-    this.categories[userId] = list.filter(c => c.id !== categoryId);
+    this.categories[userId] = list.filter(c => c.Id !== categoryId);
     if (this.categoryTasks[userId]?.[categoryId]) {
       delete this.categoryTasks[userId][categoryId];
     }

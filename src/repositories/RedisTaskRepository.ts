@@ -44,18 +44,18 @@ export class RedisTaskRepository implements ITaskRepository {
 
   async save(task: Task): Promise<Task> {
     await this.connect();
-    const id = await this.client.incr(this.counterKey(task.userId));
-    task.id = id;
-    await this.client.hSet(this.taskKey(task.userId, id), {
+    const id = await this.client.incr(this.counterKey(task.UserId));
+    task.Id = id;
+    await this.client.hSet(this.taskKey(task.UserId, id), {
       Id: id.toString(),
-      UserId: task.userId,
-      Description: task.description,
-      ExpiredAt: task.expiredAt,
-      CategoryId: task.categoryId.toString(),
+      UserId: task.UserId,
+      Description: task.Description,
+      ExpiredAt: task.ExpiredAt,
+      CategoryId: task.CategoryId.toString(),
     });
-    await this.client.rPush(this.userTasksKey(task.userId), id.toString());
+    await this.client.rPush(this.userTasksKey(task.UserId), id.toString());
     await this.client.rPush(
-      this.categoryTasksKey(task.userId, task.categoryId),
+      this.categoryTasksKey(task.UserId, task.CategoryId),
       id.toString()
     );
     return task;

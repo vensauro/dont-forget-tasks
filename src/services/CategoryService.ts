@@ -21,7 +21,7 @@ export class CategoryService {
   async deleteCategory(userId: string, categoryId: number) {
     const tasks = await this.taskRepository.findAll(userId, categoryId);
     for (const task of tasks) {
-      await this.taskRepository.delete(userId, task.id!);
+      await this.taskRepository.delete(userId, task.Id!);
     }
     await this.categoryRepository.delete(userId, categoryId);
   }

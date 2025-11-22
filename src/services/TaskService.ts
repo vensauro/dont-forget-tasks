@@ -35,8 +35,8 @@ export class TaskService {
     }
     const grouped: Record<string, Task[]> = {};
     for (const t of tasks) {
-      if (!grouped[t.categoryId]) grouped[t.categoryId] = [];
-      grouped[t.categoryId].push(t);
+      if (!grouped[t.CategoryId]) grouped[t.CategoryId] = [];
+      grouped[t.CategoryId].push(t);
     }
 
     return grouped;

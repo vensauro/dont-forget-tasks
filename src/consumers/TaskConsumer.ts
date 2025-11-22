@@ -5,13 +5,13 @@ import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";
 import { CategoryRepositoryFactory } from "../repositories/CategoryRepositoryFactory";
 
 interface CreatePayload {
-  description: string;
-  expiredAt: string; // ISO timestamp
-  categoryId: number;
+  Description: string;
+  ExpiredAt: string;
+  CategoryId: number;
 }
 
 interface DeletePayload {
-  taskId: number | string;
+  TaskId: number | string;
 }
 
 export class TaskConsumer {
@@ -40,20 +40,20 @@ export class TaskConsumer {
         console.log("[TaskConsumer] Payload:", data);
 
         if (!type || !userId || !data) {
-          throw new Error("Comando inválido: falta type/userId/data");
+          throw new Error("Comando inválido");
         }
 
         switch (type) {
           case "task.create": {
             const payload = data as CreatePayload;
-            if (!payload.description || !payload.expiredAt) {
+            if (!payload.Description || !payload.ExpiredAt) {
               throw new Error("Payload inválido para task.create");
             }
             await service.createTask({
-              description: payload.description,
+              description: payload.Description,
               userId,
-              expiredAt: payload.expiredAt,
-              categoryId: payload.categoryId
+              expiredAt: payload.ExpiredAt,
+              categoryId: payload.CategoryId
             });
             console.log(`[TaskConsumer] Tarefa criada com sucesso (user=${userId})`);
             break;
@@ -61,11 +61,11 @@ export class TaskConsumer {
 
           case "task.delete": {
             const payload = data as DeletePayload;
-            if (!payload.taskId) {
+            if (!payload.TaskId) {
               throw new Error("Payload inválido para task.delete");
             }
-            await service.deleteTask(userId, Number(payload.taskId));
-            console.log(`[TaskConsumer] Tarefa ${payload.taskId} removida (user=${userId})`);
+            await service.deleteTask(userId, Number(payload.TaskId));
+            console.log(`[TaskConsumer] Tarefa ${payload.TaskId} removida (user=${userId})`);
             break;
           }
 
@@ -76,7 +76,6 @@ export class TaskConsumer {
       } catch (err: any) {
         const message = err?.message ?? String(err);
         console.error(`[TaskConsumer] Erro processando comando: ${message}`);
-
         try {
           await publisher.taskError({
             type: "task.error",
@@ -90,7 +89,6 @@ export class TaskConsumer {
         }
       }
     });
-
-    console.log(`[TaskConsumer] ✅ Consumer inicializado na fila "${queueName}"`);
+    console.log(`[TaskConsumer] Consumer inicializado na fila "${queueName}"`);
   }
 }
