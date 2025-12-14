@@ -42,7 +42,7 @@ export class TaskController {
     const send = createSender(res);
     try {
       const userId = req.query.userId as string;
-      const taskId = req.query.taskId as string;
+      const taskId = req.params.id as string;
       if (!taskId || !userId) {
         return send.badRequest({}, { Message: "Todos os campos são obrigatórios" });
       }

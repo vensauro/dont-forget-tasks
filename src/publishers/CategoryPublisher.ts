@@ -1,7 +1,7 @@
 import { IMessengerProvider } from "../providers/messenger/IMessengerProvider";
 
 export interface EventBase<T = unknown> {
-  Type: "categories.error";
+  Type: "category.error";
   CorrelationId: string;
   UserId: string;
   Data?: T;
@@ -10,7 +10,7 @@ export interface EventBase<T = unknown> {
 }
 
 const EVENT_ROUTES = {
-  error: "categories.error",
+  error: "category.error",
 } as const;
 
 export class CategoryPublisher {

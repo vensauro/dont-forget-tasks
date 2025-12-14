@@ -1,5 +1,6 @@
 import app from "./App";
 import { env } from "./config/env";
+import { CategoryConsumer } from "./consumers/CategoryConsumer";
 import { TaskConsumer } from "./consumers/TaskConsumer";
 import { MessengerProviderFactory } from "./providers/messenger/MessengerProviderFactory";
 
@@ -16,6 +17,7 @@ class Application {
   private async initMessenger() {
     await this.messengerProvider.init();
     await TaskConsumer.init(this.messengerProvider);
+    await CategoryConsumer.init(this.messengerProvider);
     console.log("📡 Mensageiro (RabbitMQ) conectado e consumers iniciados.");
 
     // Se estiver usando Fake e quiser seed manual
@@ -24,8 +26,8 @@ class Application {
       process.env.SEED_FAKE_MESSAGES === "true" &&
       typeof (this.messengerProvider as any).seedMessage === "function"
     ) {
-      console.log("💡 Enviando mensagem fake inicial...");
-      await (this.messengerProvider as any).seedMessage("task_queue", {
+      console.log("💡 Criando categoria fake inicial...");
+      await (this.messengerProvider as any).seedMessage("category_queue", {
         Type: "category.create",
         CorrelationId: "ci89a526-fab3-48cf-9771-1b993e9578c6",
         Data: {
@@ -34,6 +36,7 @@ class Application {
         },
         OccurredAt: "2025-11-22T18:30:00.000Z"
       });
+      console.log("💡 Criando task fake inicial...");
       await (this.messengerProvider as any).seedMessage("task_queue", {
         Type: "task.create",
         CorrelationId: "ci89a526-fab3-48cf-9771-1b993e9578c7",

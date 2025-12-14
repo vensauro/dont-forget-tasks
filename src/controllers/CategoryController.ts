@@ -40,7 +40,7 @@ export class CategoryController {
     const send = createSender(res);
     try {
       const userId = req.query.userId as string;
-      const categoryId = req.query.CategoryId as string;
+      const categoryId = req.params.id as string;
       if (!categoryId || !userId) {
         return send.badRequest({}, { Message: "Todos os campos são obrigatórios" });
       }
