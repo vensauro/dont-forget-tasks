@@ -17,7 +17,7 @@ export class CategoryController {
   listCategories = async (req: Request, res: Response) => {
     const send = createSender(res);
     try {
-      const userId = req.query.userId as string;
+      const userId = req.user!.user_id;
       if (!userId) {
         return send.badRequest({}, { Message: "Todos os campos são obrigatórios" });
       }
@@ -39,7 +39,7 @@ export class CategoryController {
   getCategory = async (req: Request, res: Response) => {
     const send = createSender(res);
     try {
-      const userId = req.query.userId as string;
+      const userId = req.user!.user_id;
       const categoryId = req.params.id as string;
       if (!categoryId || !userId) {
         return send.badRequest({}, { Message: "Todos os campos são obrigatórios" });

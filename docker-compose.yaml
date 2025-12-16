@@ -8,6 +8,9 @@ services:
       - rabbitmq
     environment:
       - RABBIT_URL=amqp://rabbitmq:5672
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
     networks:
       - app_network
     ports:

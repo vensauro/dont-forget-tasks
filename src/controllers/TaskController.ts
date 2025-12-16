@@ -19,7 +19,7 @@ export class TaskController {
     try {
       const categoryId = req.query!!.categoryId && 
         typeof req.query.categoryId == 'string' ? parseInt(req.query.categoryId) : undefined;
-      const userId = req.query.userId as string;
+      const userId = req.user!.user_id;
       if (!userId) {
         return send.badRequest({}, { Message: "Campo para consulta é obrigatório" });
       }
@@ -41,7 +41,7 @@ export class TaskController {
   getTask = async (req: Request, res: Response) => {
     const send = createSender(res);
     try {
-      const userId = req.query.userId as string;
+      const userId = req.user!.user_id;
       const taskId = req.params.id as string;
       if (!taskId || !userId) {
         return send.badRequest({}, { Message: "Todos os campos são obrigatórios" });
