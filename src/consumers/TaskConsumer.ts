@@ -60,6 +60,27 @@ export class TaskConsumer {
             break;
           }
 
+          case "task.update": {
+            if (!data.taskId || !data.userId) {
+              throw new Error("Payload inválido para task.update");
+            }
+
+            await service.updateTask(
+              data.userId,
+              Number(data.taskId),
+              {
+                description: data.description,
+                expiredAt: data.expiredAt,
+                categoryId: data.categoryId,
+              }
+            );
+
+            console.log(
+              `[TaskConsumer] Tarefa ${data.taskId} atualizada (user=${data.userId})`
+            );
+            break;
+          }
+
           case "task.delete": {
             if (!data.taskId) {
               throw new Error("Payload inválido para task.delete");

@@ -117,4 +117,40 @@ export class RedisTaskRepository implements ITaskRepository {
       ),
     ]);
   }
+
+  async update(task: Task & { Id: number }): Promise<Task> {
+    await this.connect();
+
+    const key = this.taskKey(task.UserId, task.Id);
+    const existing = await this.client.hGetAll(key);
+
+    if (Object.keys(existing).length === 0) {
+      throw new Error("Task não encontrada");
+    }
+
+    const oldCategoryId = parseInt(existing.CategoryId, 10);
+
+    await this.client.hSet(key, {
+      Description: task.Description,
+      ExpiredAt: task.ExpiredAt,
+      CategoryId: task.CategoryId.toString(),
+    });
+
+    // Se mudou de categoria, atualiza os índices
+    if (oldCategoryId !== task.CategoryId) {
+      await Promise.all([
+        this.client.lRem(
+          this.categoryTasksKey(task.UserId, oldCategoryId),
+          0,
+          task.Id.toString()
+        ),
+        this.client.rPush(
+          this.categoryTasksKey(task.UserId, task.CategoryId),
+          task.Id.toString()
+        ),
+      ]);
+    }
+
+    return task;
+  }
 }

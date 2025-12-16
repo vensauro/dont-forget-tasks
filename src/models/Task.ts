@@ -7,3 +7,5 @@ export class Task {
     public Id?: number
   ) {}
 }
+
+export type TaskWithId = Task & { Id: number };

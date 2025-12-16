@@ -1,12 +1,12 @@
 import { ITaskRepository } from "../repositories/ITaskRepository";
 import { ICategoryRepository } from "../repositories/ICategoryRepository";
-import { Task } from "../models/Task";
+import { Task, TaskWithId } from "../models/Task";
 
 export class TaskService {
   constructor(
     private readonly taskRepository: ITaskRepository,
     private readonly categoryRepository: ICategoryRepository
-  ) {}
+  ) { }
 
   async createTask(data: {
     description: string;
@@ -48,5 +48,33 @@ export class TaskService {
 
   async getTask(taskId: number, userId: string): Promise<Task | null> {
     return this.taskRepository.findById(taskId, userId);
+  }
+
+  async updateTask(
+    userId: string,
+    taskId: number,
+    data: {
+      description?: string;
+      expiredAt?: string;
+      categoryId?: number;
+    }
+  ): Promise<Task> {
+    const task = await this.getTask(taskId, userId) as TaskWithId;
+    if (!task) throw new Error("Task não encontrada");
+    if (data.categoryId !== undefined) {
+      const category = await this.categoryRepository.findById(
+        userId,
+        data.categoryId
+      );
+      if (!category) throw new Error("Categoria inexistente");
+      task.CategoryId = data.categoryId;
+    }
+    if (data.description !== undefined) {
+      task.Description = data.description;
+    }
+    if (data.expiredAt !== undefined) {
+      task.ExpiredAt = data.expiredAt;
+    }
+    return await this.taskRepository.update(task);
   }
 }
