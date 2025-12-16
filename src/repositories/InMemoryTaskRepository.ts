@@ -38,13 +38,9 @@ export class InMemoryTaskRepository implements ITaskRepository {
 
   async update(task: Task & { Id: number }): Promise<Task> {
     const userTasks = this.tasks[task.UserId];
-    if (!userTasks) {
-      throw new Error("Task não encontrada");
-    }
+    if (!userTasks) throw new Error("Task não encontrada");
     const index = userTasks.findIndex(t => t.Id === task.Id);
-    if (index === -1) {
-      throw new Error("Task não encontrada");
-    }
+    if (index === -1) throw new Error("Task não encontrada");
     userTasks[index] = task;
     return task;
   }

@@ -56,4 +56,13 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
   getTasksForCategory(userId: string, categoryId: number): number[] {
     return this.categoryTasks[userId]?.[categoryId] || [];
   }
+
+  async update(category: Category & { Id: number }): Promise<Category> {
+    const list = this.categories[category.UserId];
+    if (!list) throw new Error("Categoria não encontrada");
+    const index = list.findIndex(c => c.Id === category.Id);
+    if (index === -1) throw new Error("Categoria não encontrada");
+    list[index] = category;
+    return category;
+  }
 }

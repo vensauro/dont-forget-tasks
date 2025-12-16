@@ -1,4 +1,4 @@
-import { Category } from "../models/Category";
+import { Category, CategoryWithId } from "../models/Category";
 import { ICategoryRepository } from "../repositories/ICategoryRepository";
 import { ITaskRepository } from "../repositories/ITaskRepository";
 
@@ -28,5 +28,20 @@ export class CategoryService {
 
   async getCategory(userId: string, categoryId: number): Promise<Category | null> {
     return this.categoryRepository.findById(userId, categoryId);
+  }
+
+  async updateCategory(
+    userId: string,
+    categoryId: number,
+    data: {
+      name?: string;
+    }
+  ): Promise<Category> {
+    const category = await this.getCategory(userId, categoryId) as CategoryWithId;
+    if (!category || category.Id === undefined) throw new Error("Categoria não encontrada");
+    if (data.name !== undefined) {
+      category.Name = data.name;
+    }
+    return this.categoryRepository.update(category);
   }
 }

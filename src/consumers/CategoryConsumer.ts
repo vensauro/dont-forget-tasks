@@ -54,6 +54,25 @@ export class CategoryConsumer {
             break;
           }
 
+          case "category.update": {
+            if (!data.categoryId || !data.userId) {
+              throw new Error("Payload inválido para category.update");
+            }
+
+            await service.updateCategory(
+              data.userId,
+              Number(data.categoryId),
+              {
+                name: data.name,
+              }
+            );
+
+            console.log(
+              `[CategoryConsumer] Categoria ${data.categoryId} atualizada (user=${data.userId})`
+            );
+            break;
+          }
+
           case "category.delete": {
             if (!data.categoryId) {
               throw new Error("Payload inválido para category.delete");

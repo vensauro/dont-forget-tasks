@@ -5,3 +5,5 @@ export class Category {
     public Id?: number
   ) {}
 }
+
+export type CategoryWithId = Category & { Id: number };

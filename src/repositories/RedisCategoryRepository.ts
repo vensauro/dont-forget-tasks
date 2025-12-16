@@ -103,4 +103,17 @@ export class RedisCategoryRepository implements ICategoryRepository {
       this.client.lRem(this.listKey(userId), 0, categoryId.toString()),
     ]);
   }
+
+  async update(category: Category & { Id: number }): Promise<Category> {
+    await this.connect();
+    const key = this.categoryKey(category.UserId, category.Id);
+    const existing = await this.client.hGetAll(key);
+    if (Object.keys(existing).length === 0) {
+      throw new Error("Categoria não encontrada");
+    }
+    await this.client.hSet(key, {
+      Name: category.Name,
+    });
+    return category;
+  }
 }
