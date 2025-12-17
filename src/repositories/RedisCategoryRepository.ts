@@ -63,27 +63,20 @@ export class RedisCategoryRepository implements ICategoryRepository {
   }
 
   async findAll(userId: string): Promise<Category[]> {
-    console.log("[Redis] findAll:", userId);
-
     const ids = await this.client.lRange(this.listKey(userId), 0, -1);
     const categories: Category[] = [];
-
     for (const idStr of ids) {
       const id = Number(idStr);
       const data = await this.client.hGetAll(
         this.categoryKey(userId, id)
       );
-
       if (!data || Object.keys(data).length === 0) continue;
-
       categories.push({
         Id: id,
         UserId: userId,
         Name: data.Name,
       });
     }
-
-    console.log("[Redis] Categorias:", categories);
     return categories;
   }
 
@@ -91,14 +84,10 @@ export class RedisCategoryRepository implements ICategoryRepository {
     userId: string,
     categoryId: number
   ): Promise<Category | null> {
-    console.log("[Redis] findById:", userId, categoryId);
-
     const data = await this.client.hGetAll(
       this.categoryKey(userId, categoryId)
     );
-
     if (!data || Object.keys(data).length === 0) return null;
-
     return {
       Id: categoryId,
       UserId: userId,
@@ -109,15 +98,12 @@ export class RedisCategoryRepository implements ICategoryRepository {
   async update(category: CategoryWithId): Promise<Category> {
     const key = this.categoryKey(category.UserId, category.Id);
     const existing = await this.client.hGetAll(key);
-
     if (!existing || Object.keys(existing).length === 0) {
       throw new Error("Categoria não encontrada");
     }
-
     await this.client.hSet(key, {
       Name: category.Name,
     });
-
     return category;
   }
 

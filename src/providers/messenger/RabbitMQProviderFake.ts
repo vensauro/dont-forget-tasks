@@ -5,7 +5,7 @@ export class RabbitMQProviderFake implements IMessengerProvider {
   private consumers: { [queue: string]: (msg: any) => void } = {};
 
   async init() {
-    console.log("✅ RabbitMQ FAKE inicializado!");
+    console.log("RabbitMQ FAKE inicializado!");
     this.channel = {};
   }
 
@@ -15,15 +15,12 @@ export class RabbitMQProviderFake implements IMessengerProvider {
   }
 
   async publish(queue: string, message: object) {
-    console.log(`[FAKE] Publicando na fila "${queue}":`, message);
-
     if (this.consumers[queue]) {
       this.consumers[queue](message);
     }
   }
 
   async consume(queue: string, callback: (msg: any) => void) {
-    console.log(`[FAKE] Consumindo fila "${queue}"...`);
     this.consumers[queue] = callback;
   }
 

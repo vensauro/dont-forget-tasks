@@ -27,7 +27,6 @@ export function authenticateJwt(
   }
 
   try {
-    console.log(JwtVerifyConfig, 1233);
     const decoded = jwt.verify(
       token,
       JwtVerifyConfig.secret,
@@ -37,8 +36,6 @@ export function authenticateJwt(
         algorithms: JwtVerifyConfig.algorithms,
       }
     ) as JwtPayload;
-
-    console.log(decoded, 1234)
 
     req.user = decoded;
 

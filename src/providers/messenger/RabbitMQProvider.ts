@@ -15,7 +15,7 @@ export class RabbitMQProvider implements IMessengerProvider {
       const prefetch = Number(process.env.RABBIT_PREFETCH ?? "10");
       await this.publishChannel.prefetch(prefetch);
 
-      console.log(`✅ RabbitMQ conectado! (prefetch=${prefetch})`);
+      console.log(`✅ RabbitMQ conectado!`);
     } catch (err) {
       console.error("❌ Erro ao inicializar RabbitMQ:", err);
       throw err;
@@ -101,7 +101,7 @@ export class RabbitMQProvider implements IMessengerProvider {
       { noAck: false }
     );
 
-    console.log(`📥 Consumer ligado na fila "${queue}"`);
+    console.log(`Consumer ligado na fila "${queue}"`);
   }
 
   public async close(): Promise<void> {
@@ -112,7 +112,7 @@ export class RabbitMQProvider implements IMessengerProvider {
       if (this.connection) {
         await this.connection.close();
       }
-      console.log("🔌 RabbitMQ desconectado.");
+      console.log("RabbitMQ desconectado.");
     } catch (err) {
       console.error("Erro ao fechar conexão do RabbitMQ:", err);
     }

@@ -6,7 +6,7 @@ import { CategoryService } from "../services/CategoryService";
 export class CategoryConsumer {
   static async init(messenger: IMessengerProvider): Promise<void> {
     const queueName = "category_queue";
-    console.log(`[CategoryConsumer] init() chamado para fila "${queueName}"`);
+    // console.log(`[CategoryConsumer] init() chamado para fila "${queueName}"`);
 
     const categoryRepository = await CategoryRepositoryFactory.create();
     const taskRepoRepository = await TaskRepositoryFactory.create();
@@ -14,8 +14,6 @@ export class CategoryConsumer {
 
     await messenger.consume(queueName, async (envelope: any) => {
       try {
-        console.log("RAW ENVELOPE:", JSON.stringify(envelope, null, 2));
-
         const inner =
           envelope.message ||
           envelope.Message ||
@@ -34,9 +32,6 @@ export class CategoryConsumer {
           inner.CorrelationId ||
           "unknown";
 
-        console.log(`[CategoryConsumer] Recebido: ${type} (cid=${correlationId})`);
-        console.log("[CategoryConsumer] Payload:", data);
-
         if (!type || !data) {
           throw new Error("Comando inválido (sem Type ou Data)");
         }
@@ -48,9 +43,6 @@ export class CategoryConsumer {
               name: data.name,
             });
 
-            console.log(
-              `[CategoryConsumer] Categoria criada (user=${data.userId})`
-            );
             break;
           }
 
@@ -67,9 +59,6 @@ export class CategoryConsumer {
               }
             );
 
-            console.log(
-              `[CategoryConsumer] Categoria ${data.categoryId} atualizada (user=${data.userId})`
-            );
             break;
           }
 
@@ -80,9 +69,6 @@ export class CategoryConsumer {
 
             await service.deleteCategory(data.userId, Number(data.categoryId));
 
-            console.log(
-              `[CategoryConsumer] Categoria removida (id=${data.categoryId}, user=${data.userId})`
-            );
             break;
           }
 
@@ -96,7 +82,5 @@ export class CategoryConsumer {
         console.error(`[CategoryConsumer] Erro: ${err.message}`);
       }
     });
-
-    console.log(`[CategoryConsumer] Consumer inicializado na fila ${queueName}`);
   }
 }

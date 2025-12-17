@@ -26,7 +26,7 @@ class Application {
       process.env.SEED_FAKE_MESSAGES === "true" &&
       typeof (this.messengerProvider as any).seedMessage === "function"
     ) {
-      console.log("💡 Criando categoria fake inicial...");
+      console.log("Criando categoria fake inicial...");
       await (this.messengerProvider as any).seedMessage("category_queue", {
         Type: "category.create",
         CorrelationId: "ci89a526-fab3-48cf-9771-1b993e9578c6",
@@ -36,7 +36,7 @@ class Application {
         },
         OccurredAt: "2025-11-22T18:30:00.000Z"
       });
-      console.log("💡 Criando task fake inicial...");
+      console.log("Criando task fake inicial...");
       await (this.messengerProvider as any).seedMessage("task_queue", {
         Type: "task.create",
         CorrelationId: "ci89a526-fab3-48cf-9771-1b993e9578c7",

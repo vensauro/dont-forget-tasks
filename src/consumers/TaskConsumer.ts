@@ -6,7 +6,7 @@ import { CategoryRepositoryFactory } from "../repositories/CategoryRepositoryFac
 export class TaskConsumer {
   static async init(messenger: IMessengerProvider): Promise<void> {
     const queueName = "task_queue";
-    console.log(`[TaskConsumer] init() chamado para fila "${queueName}"`);
+    // console.log(`[TaskConsumer] init() chamado para fila "${queueName}"`);
 
     const taskRepository = await TaskRepositoryFactory.create();
     const categoryRepository = await CategoryRepositoryFactory.create();
@@ -14,8 +14,6 @@ export class TaskConsumer {
 
     await messenger.consume(queueName, async (envelope: any) => {
       try {
-        console.log("RAW ENVELOPE:", JSON.stringify(envelope, null, 2));
-
         const inner =
           envelope.message ||
           envelope.Message ||
@@ -34,9 +32,6 @@ export class TaskConsumer {
           inner.CorrelationId ||
           "unknown";
 
-        console.log(`[TaskConsumer] Recebido: ${type} (cid=${correlationId})`);
-        console.log("[TaskConsumer] Payload:", data);
-
         if (!type || !data) {
           throw new Error("Comando inválido (Type/Data ausentes)");
         }
@@ -54,9 +49,6 @@ export class TaskConsumer {
               categoryId: data.categoryId,
             });
 
-            console.log(
-              `[TaskConsumer] Tarefa criada com sucesso (user=${data.userId})`
-            );
             break;
           }
 
@@ -75,9 +67,6 @@ export class TaskConsumer {
               }
             );
 
-            console.log(
-              `[TaskConsumer] Tarefa ${data.taskId} atualizada (user=${data.userId})`
-            );
             break;
           }
 
@@ -88,9 +77,6 @@ export class TaskConsumer {
 
             await service.deleteTask(data.userId, Number(data.taskId));
 
-            console.log(
-              `[TaskConsumer] Tarefa ${data.taskId} removida (user=${data.userId})`
-            );
             break;
           }
 
@@ -104,9 +90,5 @@ export class TaskConsumer {
         console.error(`[TaskConsumer] Erro: ${err.message}`);
       }
     });
-
-    console.log(
-      `[TaskConsumer] Consumer inicializado na fila "${queueName}"`
-    );
   }
 }
