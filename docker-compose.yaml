@@ -6,8 +6,10 @@ services:
     container_name: ms-node
     depends_on:
       - rabbitmq
+      - redis
     environment:
       - RABBIT_URL=amqp://rabbitmq:5672
+      - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_AUDIENCE=${JWT_AUDIENCE}
@@ -15,6 +17,20 @@ services:
       - app_network
     ports:
       - "3000:3000"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - app_network
+
+volumes:
+  redis_data:
 
 networks:
   app_network:

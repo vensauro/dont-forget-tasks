@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { TaskController } from "./controllers/TaskController";
 
-const router = Router();
-const controller = new TaskController();
+export function createTaskRouter(controller: TaskController) {
+  const router = Router();
 
-router.get("/", controller.listTasks);
-router.get("/:id", controller.getTask);
+  router.get("/", controller.listTasks);
+  router.get("/:id", controller.getTask);
 
-export default router;
+  return router;
+}

@@ -8,8 +8,8 @@ export class TaskConsumer {
     const queueName = "task_queue";
     console.log(`[TaskConsumer] init() chamado para fila "${queueName}"`);
 
-    const taskRepository = TaskRepositoryFactory.create();
-    const categoryRepository = CategoryRepositoryFactory.create();
+    const taskRepository = await TaskRepositoryFactory.create();
+    const categoryRepository = await CategoryRepositoryFactory.create();
     const service = new TaskService(taskRepository, categoryRepository);
 
     await messenger.consume(queueName, async (envelope: any) => {

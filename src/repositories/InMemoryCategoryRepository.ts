@@ -1,4 +1,4 @@
-import { Category } from "../models/Category";
+import { Category, CategoryWithId } from "../models/Category";
 import { ICategoryRepository } from "./ICategoryRepository";
 
 export class InMemoryCategoryRepository implements ICategoryRepository {
@@ -57,7 +57,7 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
     return this.categoryTasks[userId]?.[categoryId] || [];
   }
 
-  async update(category: Category & { Id: number }): Promise<Category> {
+  async update(category: CategoryWithId): Promise<Category> {
     const list = this.categories[category.UserId];
     if (!list) throw new Error("Categoria não encontrada");
     const index = list.findIndex(c => c.Id === category.Id);

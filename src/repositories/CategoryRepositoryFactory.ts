@@ -6,19 +6,19 @@ let inMemoryInstance: InMemoryCategoryRepository | null = null;
 let redisInstance: RedisCategoryRepository | null = null;
 
 export class CategoryRepositoryFactory {
-  static create(): ICategoryRepository {
+  static async create(): Promise<ICategoryRepository> {
     const useRedis = process.env.USE_REDIS === "true";
 
     if (useRedis) {
       if (!redisInstance) {
-        console.log("📦 Usando RedisTaskRepository");
-        redisInstance = new RedisCategoryRepository();
+        console.log("Usando RedisCategoryRepository");
+        redisInstance = await RedisCategoryRepository.create();
       }
       return redisInstance;
     }
 
     if (!inMemoryInstance) {
-      console.log("📝 Usando InMemoryCategoryRepository");
+      console.log("Usando InMemoryCategoryRepository");
       inMemoryInstance = new InMemoryCategoryRepository();
     }
 

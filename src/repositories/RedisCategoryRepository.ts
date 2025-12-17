@@ -1,22 +1,34 @@
-import { createClient, RedisClientType } from "redis";
+import { createClient } from "redis";
 import { ICategoryRepository } from "./ICategoryRepository";
-import { Category } from "../models/Category";
+import { Category, CategoryWithId } from "../models/Category";
+
+type RedisClient = ReturnType<typeof createClient>;
 
 export class RedisCategoryRepository implements ICategoryRepository {
-  private static client: RedisClientType | null = null;
-  private client: RedisClientType;
+  private static client: RedisClient;
+  private client: RedisClient;
 
-  constructor() {
-    if (!RedisCategoryRepository.client) {
-      RedisCategoryRepository.client = createClient({
-        url: process.env.REDIS_URL || "redis://localhost:6379",
-      });
-    }
-    this.client = RedisCategoryRepository.client!;
+  private constructor(client: RedisClient) {
+    this.client = client;
   }
 
-  private async connect() {
-    if (!this.client.isOpen) await this.client.connect();
+  static async create(): Promise<RedisCategoryRepository> {
+    if (!this.client) {
+      const client = createClient({
+        url: process.env.REDIS_URL || "redis://localhost:6379",
+      });
+
+      client.on("error", err => {
+        console.error("[Redis] Erro:", err);
+      });
+
+      await client.connect();
+      console.log("[Redis] Conectado com sucesso");
+
+      this.client = client;
+    }
+
+    return new RedisCategoryRepository(this.client);
   }
 
   private counterKey(userId: string) {
@@ -35,47 +47,58 @@ export class RedisCategoryRepository implements ICategoryRepository {
     return `category:${userId}:${categoryId}:tasks`;
   }
 
-  private userTasksKey(userId: string) {
-    return `tasks:${userId}`;
-  }
-
-  private taskKey(userId: string, taskId: number) {
-    return `task:${userId}:${taskId}`;
-  }
-
   async save(userId: string, name: string): Promise<Category> {
-    await this.connect();
     const id = await this.client.incr(this.counterKey(userId));
-    await this.client.hSet(this.categoryKey(userId, id), {
-      Id: id.toString(),
-      UserId: userId,
-      Name: name,
-    });
-    await this.client.rPush(this.listKey(userId), id.toString());
+
+    await Promise.all([
+      this.client.hSet(this.categoryKey(userId, id), {
+        Id: id.toString(),
+        UserId: userId,
+        Name: name,
+      }),
+      this.client.rPush(this.listKey(userId), id.toString()),
+    ]);
+
     return { Id: id, UserId: userId, Name: name };
   }
 
   async findAll(userId: string): Promise<Category[]> {
-    await this.connect();
+    console.log("[Redis] findAll:", userId);
+
     const ids = await this.client.lRange(this.listKey(userId), 0, -1);
     const categories: Category[] = [];
+
     for (const idStr of ids) {
-      const id = parseInt(idStr, 10);
-      const data = await this.client.hGetAll(this.categoryKey(userId, id));
-      if (Object.keys(data).length === 0) continue;
+      const id = Number(idStr);
+      const data = await this.client.hGetAll(
+        this.categoryKey(userId, id)
+      );
+
+      if (!data || Object.keys(data).length === 0) continue;
+
       categories.push({
         Id: id,
         UserId: userId,
         Name: data.Name,
       });
     }
+
+    console.log("[Redis] Categorias:", categories);
     return categories;
   }
 
-  async findById(userId: string, categoryId: number): Promise<Category | null> {
-    await this.connect();
-    const data = await this.client.hGetAll(this.categoryKey(userId, categoryId));
-    if (Object.keys(data).length === 0) return null;
+  async findById(
+    userId: string,
+    categoryId: number
+  ): Promise<Category | null> {
+    console.log("[Redis] findById:", userId, categoryId);
+
+    const data = await this.client.hGetAll(
+      this.categoryKey(userId, categoryId)
+    );
+
+    if (!data || Object.keys(data).length === 0) return null;
+
     return {
       Id: categoryId,
       UserId: userId,
@@ -83,37 +106,26 @@ export class RedisCategoryRepository implements ICategoryRepository {
     };
   }
 
-  async delete(userId: string, categoryId: number): Promise<void> {
-    await this.connect();
-    const taskIds = await this.client.lRange(
-      this.categoryTasksKey(userId, categoryId),
-      0,
-      -1
-    );
-    for (const idStr of taskIds) {
-      const taskId = parseInt(idStr, 10);
-      await Promise.all([
-        this.client.del(this.taskKey(userId, taskId)),
-        this.client.lRem(this.userTasksKey(userId), 0, idStr),
-      ]);
-    }
-    await this.client.del(this.categoryTasksKey(userId, categoryId));
-    await Promise.all([
-      this.client.del(this.categoryKey(userId, categoryId)),
-      this.client.lRem(this.listKey(userId), 0, categoryId.toString()),
-    ]);
-  }
-
-  async update(category: Category & { Id: number }): Promise<Category> {
-    await this.connect();
+  async update(category: CategoryWithId): Promise<Category> {
     const key = this.categoryKey(category.UserId, category.Id);
     const existing = await this.client.hGetAll(key);
-    if (Object.keys(existing).length === 0) {
+
+    if (!existing || Object.keys(existing).length === 0) {
       throw new Error("Categoria não encontrada");
     }
+
     await this.client.hSet(key, {
       Name: category.Name,
     });
+
     return category;
+  }
+
+  async delete(userId: string, categoryId: number): Promise<void> {
+    await Promise.all([
+      this.client.del(this.categoryKey(userId, categoryId)),
+      this.client.del(this.categoryTasksKey(userId, categoryId)),
+      this.client.lRem(this.listKey(userId), 0, categoryId.toString()),
+    ]);
   }
 }

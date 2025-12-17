@@ -1,4 +1,4 @@
-import app from "./App";
+import { createApp } from "./App";
 import { env } from "./config/env";
 import { CategoryConsumer } from "./consumers/CategoryConsumer";
 import { TaskConsumer } from "./consumers/TaskConsumer";
@@ -52,7 +52,8 @@ class Application {
     }
   }
 
-  private initHttp() {
+  private async initHttp() {
+    const app = await createApp();
     app.listen(this.port, () => {
       console.log(`🚀 HTTP Server rodando na porta ${this.port}`);
     });

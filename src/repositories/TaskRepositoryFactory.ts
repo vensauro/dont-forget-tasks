@@ -6,19 +6,19 @@ let inMemoryInstance: InMemoryTaskRepository | null = null;
 let redisInstance: RedisTaskRepository | null = null;
 
 export class TaskRepositoryFactory {
-  static create(): ITaskRepository {
+  static async create(): Promise<ITaskRepository> {
     const useRedis = process.env.USE_REDIS === "true";
 
     if (useRedis) {
       if (!redisInstance) {
-        console.log("📦 Usando RedisTaskRepository");
-        redisInstance = new RedisTaskRepository();
+        console.log("Usando RedisTaskRepository");
+        redisInstance = await RedisTaskRepository.create();
       }
       return redisInstance;
     }
 
     if (!inMemoryInstance) {
-      console.log("📝 Usando InMemoryTaskRepository");
+      console.log("Usando InMemoryTaskRepository");
       inMemoryInstance = new InMemoryTaskRepository();
     }
 

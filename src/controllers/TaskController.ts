@@ -4,34 +4,65 @@ import { TaskRepositoryFactory } from "../repositories/TaskRepositoryFactory";
 import { CategoryRepositoryFactory } from "../repositories/CategoryRepositoryFactory";
 import { createSender } from "../utils/Response";
 
+function parseOptionalNumber(value: unknown): number | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (trimmed === "") return undefined;
+  const num = Number(trimmed);
+  return Number.isFinite(num) ? num : undefined;
+}
+
+function parseRequiredNumber(value: unknown): number | null {
+  if (typeof value !== "string") return null;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
 export class TaskController {
   private service: TaskService;
-  constructor() {
-    const taskRepository = TaskRepositoryFactory.create();
-    const categoryRepository = CategoryRepositoryFactory.create();
-    this.service = new TaskService(taskRepository, categoryRepository);
+
+  private constructor(service: TaskService) {
+    this.service = service;
   }
 
-  health = (res: Response) => res.status(200).json(true);
+  /**
+   * Factory assíncrona para criação do controller
+   * (necessário por causa do Redis / IO)
+   */
+  static async create(): Promise<TaskController> {
+    const taskRepository = await TaskRepositoryFactory.create();
+    const categoryRepository = await CategoryRepositoryFactory.create();
+
+    const service = new TaskService(
+      taskRepository,
+      categoryRepository
+    );
+
+    return new TaskController(service);
+  }
+
+  health = (_: Request, res: Response) => {
+    return res.status(200).json(true);
+  };
 
   listTasks = async (req: Request, res: Response) => {
     const send = createSender(res);
+
     try {
-      const categoryId = req.query!!.categoryId && 
-        typeof req.query.categoryId == 'string' ? parseInt(req.query.categoryId) : undefined;
-      const userId = req.user!.user_id;
+      const userId = req.user?.user_id;
       if (!userId) {
         return send.badRequest({}, { Message: "Campo para consulta é obrigatório" });
       }
+
+      const categoryId = parseOptionalNumber(req.query.categoryId);
+
       const tasks = await this.service.listTasks(userId, categoryId);
-      return send.response(
-        tasks,
-        {
-          Type: "task.listed",
-          UserId: userId,
-          OccurredAt: new Date().toISOString(),
-        }
-      );
+
+      return send.response(tasks, {
+        Type: "task.listed",
+        UserId: userId,
+        OccurredAt: new Date().toISOString(),
+      });
     } catch (error: any) {
       console.error(error);
       return send.serverError({}, { Error: error.message });
@@ -40,24 +71,26 @@ export class TaskController {
 
   getTask = async (req: Request, res: Response) => {
     const send = createSender(res);
+
     try {
-      const userId = req.user!.user_id;
-      const taskId = req.params.id as string;
-      if (!taskId || !userId) {
+      const userId = req.user?.user_id;
+      const taskId = parseRequiredNumber(req.params.id);
+
+      if (!userId || taskId === null) {
         return send.badRequest({}, { Message: "Todos os campos são obrigatórios" });
       }
-      const task = await this.service.getTask(parseInt(taskId), userId);
+
+      const task = await this.service.getTask(taskId, userId);
+
       if (!task) {
         return send.notFound({}, { Message: "Task não encontrada" });
       }
-      return send.response(
-        task,
-        {
-          Type: "task.get",
-          UserId: userId,
-          OccurredAt: new Date().toISOString(),
-        }
-      );
+
+      return send.response(task, {
+        Type: "task.get",
+        UserId: userId,
+        OccurredAt: new Date().toISOString(),
+      });
     } catch (error: any) {
       console.error(error);
       return send.serverError({}, { Error: error.message });
