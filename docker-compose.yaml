@@ -16,7 +16,7 @@ services:
     networks:
       - app_network
     ports:
-      - '3000:3000'
+      - '3002:3000'
 
   redis:
     image: redis:7-alpine
